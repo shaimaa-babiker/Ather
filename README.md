@@ -85,7 +85,7 @@ npm run fetch:azkar
 ## Screenshots
 
 <p align="center">
-  <img src="assets/images/stitch-home-screenshot.jpg" alt="Ather home screen" width="220">
+  <img src="assets/images/github-home-screen-demo.png" alt="Ather live demo home screen" width="220">
   <img src="assets/images/stitch-surah-list-screen.jpg" alt="Ather Quran surah list" width="220">
   <img src="assets/images/stitch-counter-screenshot.jpg" alt="Ather adhkar counter" width="220">
 </p>
