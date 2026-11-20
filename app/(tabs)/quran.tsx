@@ -319,7 +319,7 @@ export default function Quran() {
         {/* Subtle Golden Islamic Pattern */}
         <PatternBG color="#C9A96E" opacity={0.06} />
 
-        <View style={{ height: 180, justifyContent: 'space-between', padding: 18 }}>
+        <View style={{ height: 150, justifyContent: 'space-between', padding: 16 }}>
           {/* Card Top Row: Medallion + Title + Total Pill */}
           <View
             style={{
@@ -401,7 +401,7 @@ export default function Quran() {
               }}>
               <Ionicons name="play-circle" size={16} color={GOLD} />
               <Text style={{ fontFamily: FONTS.uiMed, fontSize: 11.5, color: '#FFFFFF' }}>
-                {last ? `${last.ar} · ص ${ar(data.last.page + 1)}` : 'سورة الكهف · ص ٢٩٣'}
+                {last ? `${last.ar} · ص ${ar(data.last.page + 1)}` : 'ابدأ وردك القرآني'}
               </Text>
             </View>
 

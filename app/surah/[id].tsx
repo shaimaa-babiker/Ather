@@ -25,6 +25,12 @@ import { Empty, Reveal, Stepper, ToggleRow } from '../../src/ui';
 /* ─── Serene Design Tokens (Matching Sanctuary Aesthetic) ────── */
 const NAVY = '#0A1C38';
 const GOLD = '#C9A96E';
+const PAPER_LIGHT = '#FBF8F1';
+const PAPER_DARK = '#101A2A';
+const INK_LIGHT = '#1B2A46';
+const INK_DARK = '#F1E7C8';
+const M_GOLD_LIGHT = '#B08A3E';
+const M_GOLD_DARK = '#D8BE7E';
 
 /* ─── Ayah Audio Base CDN (Sheikh Mishary Alafasy) ────────────── */
 const INIT_AYAH = { uri: 'https://everyayah.com/data/Alafasy_128kbps/001001.mp3' };
@@ -49,6 +55,16 @@ export default function Reader() {
   const TEXT_COLOR = isDark ? '#F1F5F9' : '#0B1E38';
   const BORDER_COLOR = isDark ? 'rgba(201,169,110,0.22)' : '#E8E2D8';
   const MUTED_COLOR = isDark ? '#94A3B8' : '#78716C';
+
+  /* Mushaf page surface */
+  const PAPER = isDark ? PAPER_DARK : PAPER_LIGHT;
+  const INK = isDark ? INK_DARK : INK_LIGHT;
+  const M_GOLD = isDark ? M_GOLD_DARK : M_GOLD_LIGHT;
+  const M_MUTED = isDark ? 'rgba(216,190,126,0.72)' : 'rgba(138,106,51,0.90)';
+  const M_FRAME = isDark ? 'rgba(216,190,126,0.50)' : 'rgba(176,138,62,0.55)';
+  const M_FRAME_2 = isDark ? 'rgba(216,190,126,0.26)' : 'rgba(176,138,62,0.30)';
+  const M_SEL = isDark ? 'rgba(216,190,126,0.20)' : 'rgba(176,138,62,0.14)';
+  const M_PLAY = isDark ? 'rgba(216,190,126,0.34)' : 'rgba(176,138,62,0.26)';
 
   const juz = surahJuz(n);
   const hizb = surahHizb(n);
@@ -255,68 +271,34 @@ export default function Reader() {
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-        {/* Navigation Controls: Back & Direct Surah Index Button */}
-        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}>
-          {/* Back button */}
-          <Pressable
-            onPress={() => {
-              if (router.canGoBack()) {
-                router.back();
-              } else {
-                router.navigate('/quran');
-              }
-            }}
-            hitSlop={8}
-            style={{
-              width: 38,
-              height: 38,
-              borderRadius: 19,
-              backgroundColor: CARD_BG,
-              borderWidth: 1,
-              borderColor: BORDER_COLOR,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Ionicons name="chevron-forward" size={19} color={isDark ? '#FFFFFF' : NAVY} />
-          </Pressable>
-
-          {/* Surah Index (فهرس السور) Direct Button */}
-          <Pressable
-            onPress={() => router.navigate('/quran')}
-            onLongPress={() => setIndexModal(true)}
-            hitSlop={6}
-            style={({ pressed }) => ({
-              height: 38,
-              paddingHorizontal: 10,
-              borderRadius: 19,
-              backgroundColor: pressed
-                ? '#F4F1EB'
-                : isDark
-                  ? 'rgba(201,169,110,0.14)'
-                  : '#FAF5EB',
-              borderWidth: 1,
-              borderColor: 'rgba(201,169,110,0.40)',
-              flexDirection: 'row-reverse',
-              alignItems: 'center',
-              gap: 5,
-            })}>
-            <Ionicons name="book-outline" size={15} color={GOLD} />
-            <Text
-              style={{
-                fontFamily: FONTS.uiBold,
-                fontSize: 11.5,
-                color: isDark ? '#FFFFFF' : NAVY,
-              }}>
-              الفهرس
-            </Text>
-          </Pressable>
-        </View>
+        {/* Navigation Controls */}
+        <Pressable
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.navigate('/quran');
+            }
+          }}
+          hitSlop={8}
+          style={{
+            width: 38,
+            height: 38,
+            borderRadius: 19,
+            backgroundColor: CARD_BG,
+            borderWidth: 1,
+            borderColor: BORDER_COLOR,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Ionicons name="chevron-forward" size={19} color={isDark ? '#FFFFFF' : NAVY} />
+        </Pressable>
 
         {/* Center Surah Info (Clickable: Opens In-Reader Surah Picker) */}
         <Pressable
           onPress={() => setIndexModal(true)}
           hitSlop={8}
-          style={{ alignItems: 'center' }}>
+          style={{ flex: 1, minWidth: 0, alignItems: 'center', paddingHorizontal: 4 }}>
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 4 }}>
             <Text
               style={{
@@ -324,7 +306,8 @@ export default function Reader() {
                 fontSize: 21,
                 color: isDark ? '#FFFFFF' : NAVY,
                 letterSpacing: 0.3,
-              }}>
+              }}
+              numberOfLines={1}>
               سورة {m.ar}
             </Text>
             <Ionicons name="chevron-down" size={14} color={GOLD} style={{ marginTop: 2 }} />
@@ -335,7 +318,8 @@ export default function Reader() {
               fontSize: 11,
               color: MUTED_COLOR,
               marginTop: 1,
-            }}>
+            }}
+            numberOfLines={1}>
             {m.place} · {ar(m.ayat)} {ayahWord(m.ayat)} · الجزء {ar(juz)}
           </Text>
         </Pressable>
@@ -619,122 +603,129 @@ export default function Reader() {
         {/* Swipe gesture container: active in horizontal swipe mode */}
         <View {...(readerMode === 'swipe' ? swipe.panHandlers : {})}>
           <Reveal key={`${n}-${readerMode}-${safe}-${qs}-${settings.tashkeel}`} dy={6}>
-            {/* ── Medina Mushaf Sanctuary Page Card ── */}
+            {/* ── Printed Mushaf Page ── */}
             <View
               style={{
-                backgroundColor: CARD_BG,
-                borderRadius: 22,
-                borderWidth: 1,
-                borderColor: isDark ? 'rgba(201,169,110,0.30)' : 'rgba(201,169,110,0.35)',
-                paddingHorizontal: 18,
-                paddingVertical: 22,
+                backgroundColor: PAPER,
+                borderRadius: 5,
+                borderWidth: 1.2,
+                borderColor: M_FRAME,
+                padding: 5,
                 shadowColor: '#0A1C38',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: isDark ? 0.3 : 0.05,
-                shadowRadius: 10,
-                elevation: 2,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: isDark ? 0.35 : 0.10,
+                shadowRadius: 12,
+                elevation: 3,
               }}>
-              <PatternBG color={GOLD} opacity={0.03} />
+              <View
+                style={{
+                  borderWidth: 0.8,
+                  borderColor: M_FRAME_2,
+                  borderRadius: 2,
+                  paddingHorizontal: 11,
+                  paddingTop: 10,
+                  paddingBottom: 8,
+                  overflow: 'hidden',
+                }}>
+                {/* corner motifs, as on a bound page */}
+                {(['tl', 'tr', 'bl', 'br'] as const).map((c) => (
+                  <View
+                    key={c}
+                    pointerEvents="none"
+                    style={{
+                      position: 'absolute',
+                      width: 5.5,
+                      height: 5.5,
+                      backgroundColor: PAPER,
+                      borderWidth: 0.8,
+                      borderColor: M_FRAME,
+                      transform: [{ rotate: '45deg' }],
+                      top: c[0] === 't' ? -3 : undefined,
+                      bottom: c[0] === 'b' ? -3 : undefined,
+                      left: c[1] === 'l' ? -3 : undefined,
+                      right: c[1] === 'r' ? -3 : undefined,
+                    }}
+                  />
+                ))}
 
               {/* ── Mode A: SWIPE MODE (Paginated Mushaf Page) ── */}
               {readerMode === 'swipe' ? (
                 <>
-                  {/* Top Header on Page 0: Gilded Surah Banner */}
+                  {/* Surah heading band, as printed in the mushaf */}
                   {safe === 0 ? (
-                    <View style={{ alignItems: 'center', marginBottom: 16 }}>
-                      {/* Surah Cartouche Frame */}
+                    <View style={{ marginBottom: 12 }}>
                       <View
                         style={{
-                          width: '100%',
-                          backgroundColor: isDark
-                            ? 'rgba(201,169,110,0.12)'
-                            : 'rgba(201,169,110,0.08)',
+                          height: 56,
                           borderWidth: 1,
-                          borderColor: 'rgba(201,169,110,0.40)',
-                          borderRadius: 16,
-                          paddingVertical: 12,
-                          paddingHorizontal: 16,
+                          borderColor: M_FRAME,
+                          borderRadius: 12,
+                          backgroundColor: isDark ? 'rgba(216,190,126,0.06)' : 'rgba(176,138,62,0.05)',
                           alignItems: 'center',
-                          gap: 4,
+                          justifyContent: 'center',
                         }}>
-                        <Ornament width={130} color={GOLD} />
                         <Text
                           style={{
-                            fontFamily: FONTS.display,
-                            fontSize: 26,
-                            color: isDark ? '#FFFFFF' : NAVY,
+                            fontFamily: FONTS.quran,
+                            fontSize: 24,
+                            color: INK,
                             textAlign: 'center',
-                            letterSpacing: 0.5,
                           }}>
-                          سورة {m.ar}
+                          سُورَةُ {m.ar}
                         </Text>
-                        <View
-                          style={{
-                            flexDirection: 'row-reverse',
-                            alignItems: 'center',
-                            gap: 8,
-                            marginTop: 2,
-                          }}>
-                          <View
-                            style={{
-                              backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#FFFFFF',
-                              borderWidth: 1,
-                              borderColor: 'rgba(201,169,110,0.30)',
-                              borderRadius: 8,
-                              paddingHorizontal: 8,
-                              paddingVertical: 2,
-                            }}>
-                            <Text style={{ fontFamily: FONTS.uiMed, fontSize: 10.5, color: GOLD }}>
-                              {m.place}
-                            </Text>
-                          </View>
-                          <Text style={{ fontFamily: FONTS.uiMed, fontSize: 11, color: MUTED_COLOR }}>
-                            {ar(m.ayat)} {ayahWord(m.ayat)} · الجزء {ar(juz)} · الحزب {ar(hizb)}
-                          </Text>
-                        </View>
                       </View>
 
-                      {/* Basmala Calligraphy */}
+                      <View
+                        style={{
+                          flexDirection: 'row-reverse',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          marginTop: 5,
+                          paddingHorizontal: 2,
+                        }}>
+                        <Text style={{ fontFamily: FONTS.uiMed, fontSize: 10, color: M_MUTED }}>
+                          {m.place} · {ar(m.ayat)} {ayahWord(m.ayat)}
+                        </Text>
+                        <Text style={{ fontFamily: FONTS.uiMed, fontSize: 10, color: M_MUTED }}>
+                          الجزء {ar(juz)} · الحزب {ar(hizb)}
+                        </Text>
+                      </View>
+
+                      {/* Basmala line */}
                       {n !== 1 && n !== 9 ? (
-                        <View style={{ alignItems: 'center', marginTop: 14, marginBottom: 4 }}>
-                          <Text
-                            style={{
-                              fontFamily: FONTS.quran,
-                              fontSize: qs + 4,
-                              color: isDark ? '#F1F5F9' : NAVY,
-                              textAlign: 'center',
-                              letterSpacing: 0.5,
-                            }}>
-                            {BASMALA}
-                          </Text>
-                          <View style={{ marginTop: 8 }}>
-                            <Ornament width={150} color={GOLD} />
-                          </View>
-                        </View>
+                        <Text
+                          style={{
+                            fontFamily: FONTS.quran,
+                            fontSize: qs,
+                            color: INK,
+                            textAlign: 'center',
+                            marginTop: 14,
+                            marginBottom: 4,
+                          }}>
+                          {BASMALA}
+                        </Text>
                       ) : null}
                     </View>
                   ) : (
-                    /* Header on Page > 0 */
+                    /* Running head on later pages */
                     <View
                       style={{
                         flexDirection: 'row-reverse',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingBottom: 12,
-                        marginBottom: 16,
-                        borderBottomWidth: 1,
-                        borderBottomColor: isDark
-                          ? 'rgba(201,169,110,0.20)'
-                          : 'rgba(201,169,110,0.20)',
+                        paddingBottom: 7,
+                        marginBottom: 12,
+                        borderBottomWidth: 0.8,
+                        borderBottomColor: M_FRAME_2,
                       }}>
-                      <Text style={{ fontFamily: FONTS.display, fontSize: 17, color: GOLD }}>
-                        سورة {m.ar}
+                      <Text style={{ fontFamily: FONTS.quran, fontSize: 14.5, color: M_GOLD }}>
+                        سُورَةُ {m.ar}
                       </Text>
-                      <Text style={{ fontFamily: FONTS.uiMed, fontSize: 11, color: MUTED_COLOR }}>
+                      <Text style={{ fontFamily: FONTS.uiMed, fontSize: 10, color: M_MUTED }}>
                         الجزء {ar(juz)} · الحزب {ar(hizb)}
                       </Text>
-                      <Text style={{ fontFamily: FONTS.uiMed, fontSize: 11.5, color: GOLD }}>
-                        صفحة {ar(safe + 1)}
+                      <Text style={{ fontFamily: FONTS.uiMed, fontSize: 10, color: M_MUTED }}>
+                        {m.place}
                       </Text>
                     </View>
                   )}
@@ -906,6 +897,7 @@ export default function Reader() {
                   </Text>
                 </>
               )}
+            </View>
             </View>
           </Reveal>
         </View>
