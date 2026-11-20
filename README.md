@@ -85,9 +85,13 @@ npm run fetch:azkar
 ## Screenshots
 
 <p align="center">
-  <img src="assets/images/github-home-screen-demo.png" alt="Ather live demo home screen" width="220">
-  <img src="assets/images/stitch-surah-list-screen.jpg" alt="Ather Quran surah list" width="220">
-  <img src="assets/images/stitch-counter-screenshot.jpg" alt="Ather adhkar counter" width="220">
+  <img src="assets/images/demo-splash.jpeg" alt="Ather splash screen" width="220">
+  <img src="assets/images/demo-home.jpeg" alt="Ather home screen" width="220">
+  <img src="assets/images/demo-quran.jpeg" alt="Ather Quran screen" width="220">
+  <img src="assets/images/demo-names.jpeg" alt="Ather names of Allah screen" width="220">
+  <img src="assets/images/demo-adhkar.jpeg" alt="Ather adhkar screen" width="220">
+  <img src="assets/images/demo-morning-adhkar.jpeg" alt="Ather morning adhkar counter" width="220">
+  <img src="assets/images/demo-dua.jpeg" alt="Ather daily dua screen" width="220">
 </p>
 
 ## Live Demo
