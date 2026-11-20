@@ -121,6 +121,21 @@ export default function Qibla() {
   return (
     <Screen pad={60}>
       <Header title="القبلة ومواقيت الصلاة" />
+      {!settings.geo ? (
+        <Reveal>
+          <Pressable onPress={() => enableGeo(true)}
+            style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, backgroundColor: p.goldBg, borderWidth: 1, borderColor: p.gold + '66', borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12, marginBottom: 12 }}>
+            <View style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: p.gold, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="navigate" size={18} color="#FFFFFF" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: FONTS.uiBold, fontSize: 13.5, color: p.ink, textAlign: 'right' }}>فعّل موقعك لدقة القبلة والمواقيت</Text>
+              <Text style={{ fontFamily: FONTS.ui, fontSize: 10.5, color: p.inkS, textAlign: 'right', marginTop: 1 }}>يُستخدم على جهازك فقط — ولا يُرسل إلى أي خادم</Text>
+            </View>
+            <Ionicons name="chevron-back" size={16} color={p.goldD} />
+          </Pressable>
+        </Reveal>
+      ) : null}
       <Reveal>
         <LinearGradient colors={[p.n0, p.n2]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ borderRadius: 24, overflow: 'hidden', padding: 16, borderWidth: 1, borderColor: p.dLine }}>
           <PatternBG color="#C0C0C0" opacity={0.04} />
