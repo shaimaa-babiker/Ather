@@ -1,0 +1,221 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>07 - Dhikr Counter Screen (Variant 1 - Top Mosque Hero &amp; Bottom Controller Dock)</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Amiri & Tajawal -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Tajawal:wght@300;400;500;700&amp;display=swap" rel="stylesheet">
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#0B2545',
+              dark: '#133E68',
+              teal: '#1B6A97',
+              light: '#F4F7FA',
+              border: '#E2E8F0',
+              accent: '#3B82F6'
+            }
+          },
+          fontFamily: {
+            quran: ['Amiri', 'serif'],
+            sans: ['Tajawal', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="custom-styling">
+    body {
+      font-family: 'Tajawal', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .font-dhikr {
+      font-family: 'Amiri', serif;
+      line-height: 2.1;
+    }
+    /* Dynamic ring progress styling */
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.35s ease-in-out;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    /* Subtle touch animation */
+    .tap-active:active {
+      transform: scale(0.96);
+    }
+  </style>
+<!-- END: Custom Styles -->
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-0 sm:p-4">
+<!-- BEGIN: PhoneContainer -->
+<!-- Container replicating the mobile iOS viewport dimensions -->
+<div class="w-full max-w-[393px] h-[852px] bg-[#F7F9FC] shadow-2xl rounded-[44px] overflow-hidden flex flex-col relative border border-slate-200" data-purpose="mobile-frame">
+<!-- BEGIN: iOSStatusBar -->
+<header class="w-full pt-3 px-7 flex justify-between items-center text-slate-800 text-xs font-semibold select-none z-20" data-purpose="status-bar">
+<span class="tracking-tight text-sm">9:41</span>
+<!-- iOS Right Icons (Cellular, Wifi, Battery) -->
+<div class="flex items-center space-x-1.5 space-x-reverse">
+<svg class="w-4 h-3.5 fill-current" viewBox="0 0 17 11">
+<rect height="4" rx="0.5" width="2.5" x="0" y="7"></rect>
+<rect height="6" rx="0.5" width="2.5" x="3.5" y="5"></rect>
+<rect height="8" rx="0.5" width="2.5" x="7" y="3"></rect>
+<rect height="10.5" rx="0.5" width="2.5" x="10.5" y="0.5"></rect>
+</svg>
+<svg class="w-3.5 h-3 fill-current" viewBox="0 0 16 12">
+<path d="M8 2.5C10.5 2.5 12.8 3.5 14.5 5.2L16 3.6C13.9 1.4 11.1 0 8 0C4.9 0 2.1 1.4 0 3.6L1.5 5.2C3.2 3.5 5.5 2.5 8 2.5ZM8 6.5C9.5 6.5 10.9 7.1 12 8.1L13.5 6.5C12 5.1 10.1 4.2 8 4.2C5.9 4.2 4 5.1 2.5 6.5L4 8.1C5.1 7.1 6.5 6.5 8 6.5ZM9.6 10.8C9.6 11.4 9 12 8 12C7 12 6.4 11.4 6.4 10.8C6.4 10.1 7 9.5 8 9.5C9 9.5 9.6 10.1 9.6 10.8Z"></path>
+</svg>
+<div class="w-5 h-2.5 border border-slate-700 rounded-sm p-0.5 flex items-center">
+<div class="h-full w-3.5 bg-slate-800 rounded-xs"></div>
+</div>
+</div>
+</header>
+<!-- END: iOSStatusBar -->
+<!-- BEGIN: TopNavigationBar -->
+<nav class="w-full px-5 py-2.5 flex items-center justify-between z-20" data-purpose="navigation-bar">
+<!-- Back Button -->
+<button aria-label="الرجوع" class="w-9 h-9 flex items-center justify-center rounded-full text-slate-700 hover:bg-slate-200 transition-colors tap-active">
+<svg class="w-6 h-6 stroke-current stroke-2" fill="none" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<!-- Screen Title -->
+<h1 class="text-xl font-bold text-slate-800 tracking-wide">أذكار الصباح</h1>
+<!-- Empty spacer for balanced header -->
+<div class="w-9 h-9"></div>
+</nav>
+<!-- END: TopNavigationBar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 px-5 pt-1 pb-3 flex flex-col justify-between overflow-hidden relative">
+<!-- 1. Top Mosque Hero Banner (Curved Arched Card) -->
+<div class="w-full h-44 rounded-2xl overflow-hidden relative shadow-sm my-4 shrink-0" data-purpose="hero-mosque-banner">
+  <img src="https://lh3.googleusercontent.com/aida/ALJJyrDjWb48lep3-8wisMNQyAJ3WAVmf0rqnv5cBFiGKZQxSqkCSsM3s-0F4fXeSxpIj9vJIsUFqujw9rc8_avM6E33IlVJpC6PlnuSbC8Bp2C2FJGaGD3bulJcdcEbv-INHRjkxKhqyXcsTSviGcyOK-kiGSBD_3KL2eWjF_nhrl5hq782niwIjmv4bnQLgQxEzxXubvhyBsSo01dtRyafxjJPsurjKYR8DJex1jZsaQH9" alt="مسجد مضاء ليلاً" class="w-full h-full object-cover object-center">
+  <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+</div>
+<!-- 2. Centered Dhikr Reading Card -->
+<div class="w-full bg-white rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden flex flex-col items-center justify-center p-6 my-auto" data-purpose="dhikr-card">
+<!-- Ornamental Vignette Dots -->
+<div class="w-full flex justify-center items-center opacity-60 mb-3">
+<svg class="w-16 h-3 text-slate-400" fill="currentColor" viewBox="0 0 60 12">
+<circle cx="30" cy="6" r="3"></circle>
+<circle cx="18" cy="6" r="2"></circle>
+<circle cx="42" cy="6" r="2"></circle>
+</svg>
+</div>
+<!-- Dhikr Text -->
+<p class="font-dhikr text-2xl sm:text-[23px] text-slate-800 leading-loose font-normal text-center px-2">
+    بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ
+  </p>
+<!-- Repetition Badge -->
+<span class="inline-block mt-4 text-slate-400 font-semibold text-sm">
+    (٣ مرات)
+  </span>
+</div>
+<!-- 3. Integrated Bottom Controller Card (Merged Counter Dial + Action Button + Navigation) -->
+<div class="w-full bg-white rounded-3xl border border-slate-200 shadow-sm p-3.5 flex flex-col gap-3 shrink-0" data-purpose="integrated-controller-dock">
+<!-- Upper Controller Row: Circular Dial + Complete Button -->
+<div class="w-full flex items-center gap-3">
+<!-- Circular Counter Dial -->
+<button aria-label="عدّاد التسبيح" class="relative w-16 h-16 shrink-0 flex items-center justify-center rounded-full bg-slate-50 border border-slate-100 hover:bg-slate-100/70 shadow-sm transition-all tap-active focus:outline-none" id="counterButton">
+<svg class="absolute inset-0 w-full h-full -rotate-90 p-1" viewBox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="44" stroke="#E2E8F0" stroke-width="6"></circle>
+<circle class="progress-ring-circle" cx="50" cy="50" fill="none" id="progressRing" r="44" stroke="#1E293B" stroke-dasharray="276.46" stroke-dashoffset="184.3" stroke-linecap="round" stroke-width="6.5" style="stroke-dashoffset: 184.307;"></circle>
+</svg>
+<div class="flex flex-col items-center justify-center select-none z-10">
+<span class="text-xl font-bold text-slate-800 leading-none" id="currentCount">1</span>
+<span class="text-[10px] text-slate-400 font-semibold mt-0.5">3</span>
+</div>
+</button>
+<!-- Main Action Button "تم" -->
+<button class="flex-1 h-16 bg-[#1A365D] hover:bg-[#132A4B] text-white px-5 rounded-2xl flex items-center justify-center gap-2 shadow-md tap-active transition-colors font-medium text-lg" id="btnComplete" style="background-color: rgb(14, 28, 47);">
+<svg class="w-5 h-5 stroke-current stroke-2.5" fill="none" viewBox="0 0 24 24">
+<polyline points="20 6 9 17 4 12"></polyline>
+</svg>
+<span>تم</span>
+</button>
+</div>
+<!-- Lower Quick Navigation Toolbar -->
+<div class="w-full flex items-center justify-between pt-1 border-t border-slate-100" data-purpose="actions-bar">
+<button aria-label="السابق" class="w-10 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl flex items-center justify-center shadow-xs tap-active transition-colors" id="btnPrev">
+<svg class="w-5 h-5 stroke-current stroke-2" fill="none" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<button aria-label="مشاركة الذكر" class="flex items-center gap-1.5 px-4 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl shadow-xs tap-active transition-colors text-xs font-medium" id="btnShare">
+<svg class="w-4 h-4 stroke-current stroke-2 fill-none" viewBox="0 0 24 24">
+<circle cx="18" cy="5" r="3"></circle>
+<circle cx="6" cy="12" r="3"></circle>
+<circle cx="18" cy="19" r="3"></circle>
+<line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
+<line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line>
+</svg>
+</button>
+<button aria-label="التالي" class="w-10 h-10 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl flex items-center justify-center shadow-xs tap-active transition-colors" id="btnNext">
+<svg class="w-5 h-5 stroke-current stroke-2" fill="none" viewBox="0 0 24 24">
+<path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+</div>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: iOSHomeIndicator -->
+<div class="w-full flex justify-center pb-2 pt-1">
+<div class="w-32 h-1 bg-slate-300 rounded-full"></div>
+</div>
+<!-- END: iOSHomeIndicator -->
+</div>
+<!-- END: PhoneContainer -->
+<!-- BEGIN: CounterInteractivityScript -->
+<script data-purpose="counter-logic">
+    // Counter state
+    let count = 1;
+    const maxCount = 3;
+    const circumference = 2 * Math.PI * 44; // 276.46
+
+    const countDisplay = document.getElementById('currentCount');
+    const progressRing = document.getElementById('progressRing');
+    const counterBtn = document.getElementById('counterButton');
+    const completeBtn = document.getElementById('btnComplete');
+
+    function updateProgress() {
+      countDisplay.textContent = count;
+      const offset = circumference - (count / maxCount) * circumference;
+      progressRing.style.strokeDashoffset = offset;
+    }
+
+    // Tap counter button to increment
+    counterBtn.addEventListener('click', () => {
+      if (count < maxCount) {
+        count++;
+      } else {
+        count = 1;
+      }
+      updateProgress();
+    });
+
+    // Complete button
+    completeBtn.addEventListener('click', () => {
+      count = maxCount;
+      updateProgress();
+    });
+
+    // Initial setup
+    updateProgress();
+  </script>
+<!-- END: CounterInteractivityScript -->
+
+
+
+
+
+
+</body></html>

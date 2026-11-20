@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "أثر",
+    "slug": "athar-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "atharapp",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#051020",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.athar.app",
+      "infoPlist": {
+        "NSMotionUsageDescription": "يستخدم مستشعر الحركة لتحديد اتجاه القبلة."
+      }
+    },
+    "android": {
+      "package": "com.athar.app",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "name": "أثر — أثرٌ باقٍ ونورٌ للقلوب",
+      "shortName": "أثر",
+      "lang": "ar",
+      "dir": "rtl",
+      "themeColor": "#051020",
+      "backgroundColor": "#051020",
+      "description": "أثر — القرآن الكريم · الأذكار · أسماء الله الحسنى · الأدعية · القبلة ومواقيت الصلاة"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-audio",
+      "expo-font",
+      "expo-splash-screen"
+    ]
+  }
+}
