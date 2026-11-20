@@ -69,13 +69,20 @@ Primary language is Arabic (RTL). No localization framework is in scope yet.
 - Search (Arabic stripped of diacritics, transliteration, meaning) and favorites.
 
 ### 3.5 Qibla & prayer times
-- Great-circle qibla bearing to the Kaaba (21.4225°N, 39.8262°E).
+- Foreground location permission requested once on first launch. When granted, the
+  device's GPS position drives both qibla and prayer times; the last fix is saved
+  locally so the app still works offline.
+- Great-circle qibla bearing to the Kaaba (21.4225°N, 39.8262°E) from the current
+  position, with a city-preset fallback if permission is denied or unavailable.
 - Compass mode using `expo-sensors` Magnetometer (native) or device orientation (web),
   with animated needle and automatic fallback to manual calibration.
 - Manual dial mode with drag calibration.
-- Prayer times for a city presets list using six calculation methods (Umm al-Qura,
-  MWL, Egyptian, Karachi, ISNA, Diyanet), Hanafi/Standard Asr, 12/24-hour clock,
-  Ramadan Isha adjustment, and next-prayer highlight.
+- Prayer times for the detected location (or a city preset) using six calculation
+  methods (Umm al-Qura, MWL, Egyptian, Karachi, ISNA, Diyanet), Hanafi/Standard Asr,
+  12/24-hour clock, Ramadan Isha adjustment, and next-prayer highlight. "Auto" method
+  follows the nearest preset city when using GPS.
+- Location can be disabled or refreshed at any time in Settings and on the Qibla
+  screen; choosing a city turns GPS off and uses that preset.
 
 ### 3.6 Home, favorites, settings
 - Home: greeting, Hijri/Gregorian date, next prayer, last read, quick hubs, daily
@@ -136,6 +143,8 @@ gradings that have not been checked against a primary/trusted source.
 - **Accuracy over features:** Quran text is immutable; provenance and attribution stay
   visible. Ambiguous religious content is flagged for scholarly review.
 - **Privacy:** zero network requests except recitation audio; no PII leaves the device.
+  Location is optional, used only on-device for qibla/prayer times, and the last fix is
+  stored locally (never uploaded).
 - **Offline:** cold start and all reading features must work with no connection.
 - **Performance:** 1.3 MB Quran JSON is bundled; lists use `FlatList`; memoized derived
   data; no synchronous network work on render.
@@ -165,6 +174,7 @@ gradings that have not been checked against a primary/trusted source.
 |---|---|
 | Source URLs move/404 (King Fahd site relaunch) | Script tries official URL, then a byte-identical mirror, and verifies SHA-256 |
 | Compass sensors unavailable (web/desktop, no magnetometer) | Timeout auto-switches to manual mode with a toast |
+| Location permission denied / GPS off | Automatic fallback to the selected city preset; clear status in Settings and Qibla |
 | Web audio autoplay restrictions | Playback starts from a user gesture; errors surface as toasts |
 | Prayer-time method differences | Six methods + city presets + disclaimer; user can change method |
 | Hijri date ±1 day | Kuwaiti algorithm is civil, not Umm al-Qura; offset setting ±2 days |

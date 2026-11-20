@@ -1,12 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { FONTS } from '../../src/theme';
 import { useData, useSettings, useTheme, useToast } from '../../src/store';
-import { ar, fClock, fHijri, hijri, METHODS, prayers, streak, tzOffset, type PK } from '../../src/util';
-import { getCity, surah } from '../../src/data';
+import { addDays, ar, fClock, fHijri, hijri, prayers, streak, type PK } from '../../src/util';
+import { surah } from '../../src/data';
+import { usePrayerLocation } from '../../src/location';
 import { BeadsIcon, BookIcon, HandsIcon, Ornament, PatternBG } from '../../src/art';
 import { Reveal, Screen } from '../../src/ui';
 import { MOSQUE_IMAGES } from '../../assets/images';
@@ -27,20 +28,21 @@ export default function Home() {
   const router = useRouter();
 
   const [favVerse, setFavVerse] = useState(false);
-  const now = new Date();
+  const [clock, setClock] = useState(() => Date.now());
+  useEffect(() => {
+    const iv = setInterval(() => setClock(Date.now()), 30_000);
+    return () => clearInterval(iv);
+  }, []);
+  const now = new Date(clock);
   const st = streak(data.daily);
   const last = data.last && surah(data.last.s);
 
-  // ── Next Prayer Calculation for City ──
-  const city = getCity(settings.city);
-  const mk = settings.method === 'auto' ? city.method : settings.method;
-  const method = METHODS[mk] || METHODS.umm;
-  const off = tzOffset(city.tz, now);
-  const tz = off != null ? off : city.off;
+  // ── Next Prayer Calculation for the current location ──
+  const loc = usePrayerLocation(now);
   const ram = hijri(now).month === 9;
   const times = useMemo(
-    () => prayers(now, city.lat, city.lng, tz, method, settings.asr === 'hanafi' ? 2 : 1, ram),
-    [city, mk, settings.asr, tz, ram]
+    () => prayers(now, loc.lat, loc.lng, loc.tz, loc.method, settings.asr === 'hanafi' ? 2 : 1, ram),
+    [loc.lat, loc.lng, loc.tz, loc.methodKey, settings.asr, ram, now.getFullYear(), now.getMonth(), now.getDate()]
   );
 
   const nextPrayer = useMemo(() => {
@@ -52,11 +54,16 @@ export default function Home() {
       { k: 'maghrib', l: 'المغرب' },
       { k: 'isha', l: 'العشاء' },
     ];
-    const cityNow = ((now.getTime() / 3600000 + tz) % 24 + 24) % 24;
-    const n = rows.find((r) => times[r.k] != null && (times[r.k] as number) > cityNow) || rows[0];
-    const t = times[n.k] != null ? fClock(times[n.k], settings.f24) : '';
-    return { l: n.l, time: t };
-  }, [times, tz, settings.f24]);
+    const cityNow = ((now.getTime() / 3600000 + loc.tz) % 24 + 24) % 24;
+    const found = rows.find((r) => times[r.k] != null && (times[r.k] as number) > cityNow);
+    if (found) {
+      return { l: found.l, time: fClock(times[found.k], settings.f24) };
+    }
+    // After Isha, the next prayer is tomorrow's Fajr.
+    const tomorrow = addDays(now, 1);
+    const t2 = prayers(tomorrow, loc.lat, loc.lng, loc.tz, loc.method, settings.asr === 'hanafi' ? 2 : 1, hijri(tomorrow).month === 9);
+    return { l: 'الفجر', time: fClock(t2.fajr, settings.f24) };
+  }, [times, loc.tz, loc.lat, loc.lng, loc.methodKey, settings.asr, settings.f24, now.getTime()]);
 
   /* ── 4 Essential Quick Hubs ── */
   const hubs = [
@@ -471,7 +478,7 @@ export default function Home() {
               </Text>
             </View>
             <Text style={{ fontFamily: FONTS.ui, fontSize: 10.5, color: MUTED }}>
-              الصلاة القادمة
+              {loc.isGeo ? 'مواقيت موقعك الحالي' : 'مواقيت ' + loc.city.ar}
             </Text>
           </Pressable>
         </View>

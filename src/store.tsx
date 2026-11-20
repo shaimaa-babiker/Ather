@@ -2,13 +2,13 @@ import React, { createContext, useContext, useEffect, useMemo, useRef, useState,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { palette, QSIZES, type Accent, type Mode } from './theme';
 
-export interface Settings { mode: Mode; accent: Accent; fontIdx: number; tashkeel: boolean; reminders: boolean; hijriOff: number; city: string; method: string; asr: string; f24: boolean; autoNext: boolean; rate: number; loop: boolean; muted: boolean; readerMode?: 'swipe' | 'vertical' }
+export interface Settings { mode: Mode; accent: Accent; fontIdx: number; tashkeel: boolean; reminders: boolean; hijriOff: number; city: string; method: string; asr: string; f24: boolean; autoNext: boolean; rate: number; loop: boolean; muted: boolean; readerMode?: 'swipe' | 'vertical'; geo: boolean; geoAsked?: boolean; geoLat?: number; geoLng?: number; geoAt?: number }
 export interface Data { name: string; favS: number[]; favN: number[]; favA: string[]; favD: string[]; last: { s: number; page: number } | null; daily: Record<string, string[]>; total: { dhikr: number; wards: number } }
 interface Persist { settings: Settings; data: Data }
 export type Kind = 'S' | 'N' | 'A' | 'D';
 export interface Toast { id: number; msg: string; type: string; action?: { label: string; onPress: () => void } }
 const DEF: Persist = {
-  settings: { mode: 'light', accent: 'royal', fontIdx: 1, tashkeel: true, reminders: true, hijriOff: 0, city: 'dubai', method: 'auto', asr: 'std', f24: false, autoNext: false, rate: 1, loop: false, muted: false, readerMode: 'swipe' },
+  settings: { mode: 'light', accent: 'royal', fontIdx: 1, tashkeel: true, reminders: true, hijriOff: 0, city: 'dubai', method: 'auto', asr: 'std', f24: false, autoNext: false, rate: 1, loop: false, muted: false, readerMode: 'swipe', geo: true, geoAsked: false },
   data: { name: 'مستخدم التطبيق', favS: [1, 36, 67], favN: [1, 2], favA: [], favD: ['q1'], last: null, daily: {}, total: { dhikr: 0, wards: 0 } },
 };
 const KEY = 'noor:v2';

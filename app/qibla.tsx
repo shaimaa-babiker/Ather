@@ -7,10 +7,11 @@ import { Magnetometer } from 'expo-sensors';
 import { useFocusEffect } from 'expo-router';
 import { FONTS } from '../src/theme';
 import { useSettings, useTheme, useToast } from '../src/store';
-import { ar, addDays, clamp, delta, fClock, fGreg, fHijri, tzOffset, hijri, METHODS, norm, pad2, prayers, qibla, type PK } from '../src/util';
+import { ar, addDays, clamp, delta, fClock, fGreg, fHijri, hijri, METHODS, norm, pad2, prayers, qibla, type PK } from '../src/util';
 import { CITIES, getCity } from '../src/data';
+import { useLocation, usePrayerLocation } from '../src/location';
 import { Kaaba, PatternBG } from '../src/art';
-import { Badge, Card, Header, Reveal, Screen, Section, Segmented, SelectRow, Slider } from '../src/ui';
+import { Badge, Card, Header, Reveal, Row, Screen, Section, Segmented, SelectRow, Slider, ToggleRow } from '../src/ui';
 
 const D = 280;
 const Dial = memo(function Dial({ q, gold, goldS, faint, soft, n0 }: any) {
@@ -35,11 +36,15 @@ const Dial = memo(function Dial({ q, gold, goldS, faint, soft, n0 }: any) {
 export default function Qibla() {
   const { p } = useTheme(); const { settings, setSettings } = useSettings(); const { show } = useToast();
   const city = getCity(settings.city);
+  const geo = useLocation();
   const [mode, setMode] = useState('auto'); const [head, setHead] = useState(0);
   const [dd, setDd] = useState(0); const [tick, setTick] = useState(Date.now());
-  const q = useMemo(() => qibla(city.lat, city.lng), [city]);
-  const mk = settings.method === 'auto' ? city.method : settings.method;
-  const method = METHODS[mk] || METHODS.umm;
+
+  const now = new Date(tick); const vd = addDays(now, dd);
+  const loc = usePrayerLocation(vd);
+  const q = useMemo(() => qibla(loc.lat, loc.lng), [loc.lat, loc.lng]);
+  const mk = loc.methodKey;
+  const method = loc.method;
 
   useFocusEffect(React.useCallback(() => {
     if (mode !== 'auto') return;
@@ -74,11 +79,10 @@ export default function Qibla() {
   const dl = delta(head, q); const aligned = Math.abs(dl) <= 5;
   useFocusEffect(React.useCallback(() => { const iv = setInterval(() => setTick(Date.now()), 1000); return () => clearInterval(iv); }, []));
 
-  const now = new Date(tick); const vd = addDays(now, dd);
-  const off = tzOffset(city.tz, vd); const tz = off != null ? off : city.off;
+  const tz = loc.tz;
   const ram = hijri(vd).month === 9;
   const ds = vd.getFullYear() + '-' + vd.getMonth() + '-' + vd.getDate();
-  const times = useMemo(() => prayers(vd, city.lat, city.lng, tz, method, settings.asr === 'hanafi' ? 2 : 1, ram), [ds, city, mk, settings.asr, tz, ram]);
+  const times = useMemo(() => prayers(vd, loc.lat, loc.lng, tz, method, settings.asr === 'hanafi' ? 2 : 1, ram), [ds, loc.lat, loc.lng, mk, settings.asr, tz, ram]);
   const rows: { k: PK; l: string; i: string }[] = [
     { k: 'fajr', l: 'الفجر', i: 'cloudy-night-outline' }, { k: 'sunrise', l: 'الشروق', i: 'partly-sunny-outline' },
     { k: 'dhuhr', l: 'الظهر', i: 'sunny-outline' }, { k: 'asr', l: 'العصر', i: 'partly-sunny' },
@@ -92,6 +96,28 @@ export default function Qibla() {
   const remS = rem != null ? pad2(Math.floor(rem)) + ':' + pad2(Math.floor((rem % 1) * 60)) + ':' + pad2(Math.floor(((rem * 60) % 1) * 60)) : null;
   const prog = nextT != null && nextT > prevT ? clamp((cityNow - prevT) / (nextT - prevT), 0, 1) : 0;
 
+  const geoSub = !settings.geo
+    ? 'غير مفعّل — تُستخدم المدينة المختارة'
+    : loc.isGeo
+      ? (loc.accuracy != null ? 'مفعّل · دقة ±' + ar(Math.round(loc.accuracy)) + ' م' : 'مفعّل · تم تحديد موقعك')
+      : geo.status === 'denied'
+        ? 'الإذن مرفوض — اختر مدينة يدوياً'
+        : geo.status === 'unavailable'
+          ? 'تعذّر تحديد الموقع — اختر مدينة'
+          : 'جارٍ تحديد موقعك…';
+
+  const enableGeo = async (v: boolean) => {
+    setSettings({ geo: v, geoAsked: true });
+    if (!v) return;
+    const c = await geo.refresh();
+    if (c) show('تم تحديد موقعك ✓');
+  };
+
+  const refreshGeo = async () => {
+    const c = await geo.refresh();
+    if (c) show('تم تحديث الموقع ✓');
+  };
+
   return (
     <Screen pad={60}>
       <Header title="القبلة ومواقيت الصلاة" />
@@ -100,12 +126,13 @@ export default function Qibla() {
           <PatternBG color="#C0C0C0" opacity={0.04} />
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 8 }}>
             <Ionicons name="location-outline" size={17} color={p.goldS} />
-            <Text style={{ fontFamily: FONTS.uiBlack, fontSize: 15, color: p.onDark }}>{city.ar}، {city.country}</Text>
+            <Text style={{ fontFamily: FONTS.uiBlack, fontSize: 15, color: p.onDark }}>{loc.label}</Text>
             <View style={{ flex: 1 }} />
             <View style={{ backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: p.dLine, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 }}>
               <Text style={{ fontFamily: FONTS.uiBold, fontSize: 10, color: p.goldS }}>{mode === 'auto' ? 'بوصلة الجهاز' : 'وضع يدوي'}</Text></View>
           </View>
           <Text style={{ fontFamily: FONTS.ui, fontSize: 11.5, color: p.onDarkF, textAlign: 'right', marginTop: 2 }}>{fHijri(now, settings.hijriOff)} · {fGreg(now)}</Text>
+          {loc.isGeo ? <Text style={{ fontFamily: FONTS.ui, fontSize: 10.5, color: p.goldS, textAlign: 'right', marginTop: 2 }}>{loc.sub}{loc.accuracy != null ? ' · ±' + ar(Math.round(loc.accuracy)) + ' م' : ''}</Text> : null}
           <View style={{ alignItems: 'center', marginTop: 14 }}>
             <View {...pan.panHandlers} style={{ width: D, height: D, alignItems: 'center', justifyContent: 'center' }}>
               <Svg width={20} height={14} viewBox="0 0 20 14" style={{ position: 'absolute', top: -4, zIndex: 3 }}><Path d="M10 14 L2 0 L18 0 Z" fill={p.gold} /></Svg>
@@ -154,17 +181,23 @@ export default function Qibla() {
               <View style={{ width: (prog * 100) + '%', height: '100%', backgroundColor: p.gold }} /></View>
           </View> : null}
           <Text style={{ fontFamily: FONTS.ui, fontSize: 10, color: p.inkF, textAlign: 'center', paddingBottom: 8 }}>
-            الحساب: {method.label} · العصر: {settings.asr === 'hanafi' ? 'الحنفي' : 'الجمهور'} · بتوقيت {city.ar}</Text>
+            الحساب: {method.label} · العصر: {settings.asr === 'hanafi' ? 'الحنفي' : 'الجمهور'} · بتوقيت {loc.isGeo ? 'موقعك الحالي' : city.ar}</Text>
         </Card>
       </Reveal>
 
       <Section title="إعدادات القبلة والحساب" />
       <Reveal delay={150}>
         <Card>
-          <SelectRow icon="location-outline" label="المدينة" valueLabel={city.ar + ' · ' + city.country} value={settings.city}
-            options={CITIES.map((c) => ({ key: c.id, label: c.ar, sub: c.country }))} onSelect={(k: string) => setSettings({ city: k })} />
-          <SelectRow icon="calculator-outline" label="طريقة الحساب" valueLabel={settings.method === 'auto' ? 'تلقائي (' + (METHODS[city.method] || METHODS.umm).label + ')' : method.label}
-            value={settings.method} options={[{ key: 'auto', label: 'تلقائي حسب المدينة' }].concat(Object.keys(METHODS).map((k) => ({ key: k, label: METHODS[k].label })))}
+          <ToggleRow icon="navigate-outline" title="استخدام موقعي الحالي"
+            sub={geoSub}
+            value={settings.geo} onChange={enableGeo} />
+          {settings.geo ? (
+            <Row icon="refresh-outline" title="تحديث الموقع" sub="إعادة قراءة إحداثيات جهازك" onPress={refreshGeo} />
+          ) : null}
+          <SelectRow icon="location-outline" label="المدينة (احتياطي)" valueLabel={loc.isGeo ? 'يُستخدم موقعك الحالي — اختر مدينة للتغيير' : city.ar + ' · ' + city.country} value={settings.city}
+            options={CITIES.map((c) => ({ key: c.id, label: c.ar, sub: c.country }))} onSelect={(k: string) => setSettings({ city: k, geo: false })} />
+          <SelectRow icon="calculator-outline" label="طريقة الحساب" valueLabel={settings.method === 'auto' ? 'تلقائي (' + (METHODS[mk] || METHODS.umm).label + ')' : method.label}
+            value={settings.method} options={[{ key: 'auto', label: 'تلقائي حسب الموقع' }].concat(Object.keys(METHODS).map((k) => ({ key: k, label: METHODS[k].label })))}
             onSelect={(k: string) => setSettings({ method: k })} />
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: p.line, gap: 12 }}>
             <Text style={{ fontFamily: FONTS.uiBold, fontSize: 14, color: p.ink }}>مذهب العصر</Text>
@@ -188,7 +221,7 @@ export default function Qibla() {
         </Card>
       </Reveal>
       <Text style={{ fontFamily: FONTS.ui, fontSize: 10.5, color: p.inkF, textAlign: 'center', marginTop: 14, lineHeight: 18 }}>
-        المواقيت محسوبة فلكياً وقد تختلف دقائق عن التقويم المحلي.
+        المواقيت محسوبة فلكياً من موقعك وبتوقيت جهازك، وقد تختلف دقائق عن التقويم المحلي.
       </Text>
     </Screen>
   );

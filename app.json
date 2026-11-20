@@ -33,7 +33,13 @@
       "expo-router",
       "expo-audio",
       "expo-font",
-      "expo-splash-screen"
+      "expo-splash-screen",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "يستخدم التطبيق موقعك لحساب مواقيت الصلاة واتجاه القبلة بدقة."
+        }
+      ]
     ]
   }
 }

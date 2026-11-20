@@ -66,6 +66,10 @@ and a web export as the minimum verification.
   `app/surah/[id].tsx` using a second `useAudioPlayer`.
 - **Content:** `src/data.ts` — loads generated JSON, exports `SURAHS`, `NAMES`,
   `ADHKAR`, `ALL_ADHKAR`, `DUAS`, `CITIES`, `BASMALA`, and helpers.
+- **Location:** `src/location.tsx` — `LocationProvider` (expo-location permission,
+  GPS fix, cached coords) and `usePrayerLocation()` (coordinates, device time-zone
+  offset, calculation method, labels). `LocationProvider` wraps the app inside
+  `StoreProvider`.
 - **Theme:** `src/theme.ts` — palette function (`light`/`dark`), fonts (`FONTS`),
   Quran sizes (`QSIZES`), accents. `useTheme()` returns `{ p, dark, qs, qlh }`.
 - **UI kit:** `src/ui.tsx` — `Screen`, `Header`, `Card`, `Sheet`, `Btn`, `Soft`,
@@ -127,6 +131,13 @@ screens. Screens read user state from the store; nothing is persisted server-sid
 Extend `Settings` or `Data` in `src/store.tsx`, add the field to `DEF`, and access it
 through `useSettings` / `useData`. Bump the storage key only for a breaking migration.
 
+**Location / prayer times**
+Use `usePrayerLocation()` for coordinates, `tz`, and method; do not read
+`settings.city` directly for calculations. GPS is used when `settings.geo` is true and a
+fix exists; otherwise the city preset is the fallback. `settings.geoAsked` makes the
+automatic permission prompt happen only once — explicit user actions may prompt again.
+Never request background location.
+
 **Add an adhkar set / dua / city**
 Adhkar sets come from `src/azkar.json` plus `CORE_META` in `src/data.ts`; duas and
 cities are static arrays in `src/data.ts`. Follow existing interfaces (`ASet`, `Dua`,
@@ -152,6 +163,11 @@ directly.
   `hydrated` / `ready` to avoid flicker.
 - `noor:v2` is the storage key even though the brand is Ather; changing it silently
   wipes user data.
+- Location permission is foreground-only. If it is denied, the app sets `geo: false`
+  and falls back to the selected city; do not loop permission requests on launch.
+- GPS gives coordinates, not a time zone. `usePrayerLocation()` uses the device time
+  zone; if the phone's clock/time zone is wrong, prayer times will be shifted.
+- Coordinates are persisted locally (`geoLat`/`geoLng`/`geoAt`) for offline starts.
 - `app.json` sets the brand to Ather (`athar-app`, `com.athar.app`), while `README.md`
   and some copy still say «القرآن والأذكار» and “Expo SDK 54.” The installed SDK is 58.
 - No `.git` directory: avoid commands that assume version control; create backups of
@@ -166,5 +182,7 @@ directly.
 - [ ] RTL layout and Arabic numerals look correct; no clipped diacritics.
 - [ ] Light and dark modes both render; no hard-coded light-only text colors.
 - [ ] Offline behavior still works for reading flows.
+- [ ] Location permission prompt appears once; denial still yields prayer times from
+  the selected city.
 - [ ] No new network calls, tracking, or storage keys introduced.
 - [ ] Religious text/provenance untouched unless the task explicitly requires it.

@@ -21,6 +21,7 @@ Product scope lives in `PROJECT_SCOPE.md`; agent conventions live in `CLAUDE.md`
 | Web output | Expo static export, single-page (`output: "single"`) | — |
 | Persistence | AsyncStorage | `2.2.0` |
 | Audio | expo-audio | `~58.0.12` |
+| Location | expo-location | `~58.0.22` |
 | Sensors | expo-sensors (Magnetometer) | `~58.0.5` |
 | Graphics | react-native-svg | `15.16.0` |
 | Gradients | expo-linear-gradient | `~58.0.4` |
@@ -53,6 +54,7 @@ app/                        expo-router routes
   names.tsx  qibla.tsx  settings.tsx  favorites.tsx
 src/
   store.tsx                 Context state + AsyncStorage persistence
+  location.tsx              GPS permission, coordinates, prayer-location resolver
   player.tsx                full-surah audio provider + mini/full player
   data.ts                   typed content loaders and selectors
   theme.ts                  palettes, fonts, sizes, accents
@@ -78,6 +80,13 @@ size, and line height from settings.
 playback and is controlled from a mini-player and full player. The Quran reader owns a
 second player for individual ayahs. Audio mode is configured for silent-mode playback
 and ducking; playback state is throttled (`updateInterval: 250`).
+
+**Location model.** `LocationProvider` requests foreground location permission once
+(`geoAsked`), keeps the last fix in memory and in Settings (`geoLat`/`geoLng`/`geoAt`),
+and refreshes it when the app returns to the foreground after 10 minutes.
+`usePrayerLocation()` resolves coordinates, the device time-zone offset, and the
+calculation method: GPS plus the nearest preset city's method when "auto", otherwise
+the selected city preset. Denial or GPS failure falls back to the city.
 
 **Rendering model.** Screens use RN primitives plus `react-native-svg` art. Long lists
 use `FlatList`; the reader computes pages dynamically from the selected font size and
@@ -111,8 +120,8 @@ app surfaces source attribution in the Quran screens and the FAQ.
 
 | Target | How |
 |---|---|
-| iOS | Expo Go / dev build; bundle id `com.athar.app`; motion permission string for qibla |
-| Android | Expo Go / dev build; package `com.athar.app`; edge-to-edge enabled |
+| iOS | Expo Go / dev build; bundle id `com.athar.app`; motion + when-in-use location permission strings |
+| Android | Expo Go / dev build; package `com.athar.app`; edge-to-edge enabled; fine/coarse location permissions |
 | Web | `expo export -p web` → `dist/`; Metro bundler; single-page RTL site |
 
 The web build is not just a fallback: it styles the document (`lang="ar"`, `dir="rtl"`,

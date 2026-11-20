@@ -8,6 +8,7 @@ import { useFonts } from 'expo-font';
 import { Amiri_400Regular, Amiri_700Bold } from '@expo-google-fonts/amiri';
 import { Tajawal_400Regular, Tajawal_500Medium, Tajawal_700Bold, Tajawal_800ExtraBold } from '@expo-google-fonts/tajawal';
 import { StoreProvider, useData, useTheme } from '../src/store';
+import { LocationProvider } from '../src/location';
 import { PlayerProvider, MiniPlayer } from '../src/player';
 import { FONTS } from '../src/theme';
 import { Crescent, MosqueScene, Ornament, PatternBG, StarMedallion } from '../src/art';
@@ -170,5 +171,5 @@ function Inner() {
 }
 
 export default function Root() {
-  return <SafeAreaProvider><StoreProvider><Inner /></StoreProvider></SafeAreaProvider>;
+  return <SafeAreaProvider><StoreProvider><LocationProvider><Inner /></LocationProvider></StoreProvider></SafeAreaProvider>;
 }

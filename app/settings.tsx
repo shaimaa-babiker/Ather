@@ -5,13 +5,30 @@ import { ACCENTS, FLABELS, FONTS } from '../src/theme';
 import { useData, useSettings, useTheme, useToast } from '../src/store';
 import { ar, METHODS } from '../src/util';
 import { CITIES } from '../src/data';
+import { useLocation } from '../src/location';
 import { Badge, Card, Confirm, Header, Reveal, Row, Screen, Section, Segmented, SelectRow, Stepper, ToggleRow } from '../src/ui';
 
 export default function Settings() {
   const { p } = useTheme(); const { settings, setSettings } = useSettings();
   const { data, clearFavs, reset, snap, restore } = useData(); const { show } = useToast();
+  const geo = useLocation();
   const [c1, setC1] = useState(false); const [c2, setC2] = useState(false);
   const city = CITIES.find((c) => c.id === settings.city) || CITIES[0];
+  const geoSub = !settings.geo
+    ? 'غير مفعّل — تُستخدم المدينة المختارة'
+    : geo.coords
+      ? (geo.coords.accuracy != null ? 'مفعّل · دقة ±' + ar(Math.round(geo.coords.accuracy)) + ' م' : 'مفعّل · تم تحديد موقعك')
+      : geo.status === 'denied'
+        ? 'الإذن مرفوض — اختر مدينة يدوياً'
+        : geo.status === 'unavailable'
+          ? 'تعذّر تحديد الموقع — اختر مدينة'
+          : 'جارٍ تحديد موقعك…';
+  const enableGeo = async (v: boolean) => {
+    setSettings({ geo: v, geoAsked: true });
+    if (!v) return;
+    const c = await geo.refresh();
+    if (c) show('تم تحديد موقعك ✓');
+  };
   return (
     <Screen pad={60}>
       <Header title="الإعدادات" />
@@ -51,10 +68,14 @@ export default function Settings() {
       <Section title="الصلاة والتلاوة" />
       <Reveal delay={140}>
         <Card>
-          <SelectRow icon="location-outline" label="المدينة" valueLabel={city.ar + ' · ' + city.country} value={settings.city}
-            options={CITIES.map((c) => ({ key: c.id, label: c.ar, sub: c.country }))} onSelect={(k: string) => setSettings({ city: k })} />
-          <SelectRow icon="calculator-outline" label="طريقة حساب المواقيت" valueLabel={settings.method === 'auto' ? 'تلقائي حسب المدينة' : (METHODS[settings.method] || METHODS.umm).label}
-            value={settings.method} options={[{ key: 'auto', label: 'تلقائي حسب المدينة' }].concat(Object.keys(METHODS).map((k) => ({ key: k, label: METHODS[k].label })))}
+          <ToggleRow icon="navigate-outline" title="استخدام موقعي الحالي" sub={geoSub} value={settings.geo} onChange={enableGeo} />
+          {settings.geo ? (
+            <Row icon="refresh-outline" title="تحديث الموقع" sub="إعادة قراءة إحداثيات جهازك" onPress={async () => { const c = await geo.refresh(); if (c) show('تم تحديث الموقع ✓'); }} />
+          ) : null}
+          <SelectRow icon="location-outline" label="المدينة (احتياطي)" valueLabel={settings.geo && geo.coords ? 'يُستخدم موقعك الحالي — اختر مدينة للتغيير' : city.ar + ' · ' + city.country} value={settings.city}
+            options={CITIES.map((c) => ({ key: c.id, label: c.ar, sub: c.country }))} onSelect={(k: string) => setSettings({ city: k, geo: false })} />
+          <SelectRow icon="calculator-outline" label="طريقة حساب المواقيت" valueLabel={settings.method === 'auto' ? 'تلقائي حسب الموقع' : (METHODS[settings.method] || METHODS.umm).label}
+            value={settings.method} options={[{ key: 'auto', label: 'تلقائي حسب الموقع' }].concat(Object.keys(METHODS).map((k) => ({ key: k, label: METHODS[k].label })))}
             onSelect={(k: string) => setSettings({ method: k })} />
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: p.line, gap: 12 }}>
             <Text style={{ fontFamily: FONTS.uiBold, fontSize: 14, color: p.ink }}>صيغة الوقت</Text>
